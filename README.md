@@ -1,19 +1,128 @@
-<p align="center">
-<img src="https://github.com/kura-labs-org/kuralabs_deployment_1/blob/main/Kuralogo.png">
-</p>
-<h1 align="center">C4_deployment-1.1<h1> 
+# KuraLabs
 
-Demonstrate your ability to run a Jenkins build and manually deploy to Elastic Beanstalk.
+Deployment 1
+Build test and deploy a flask application on Jenkins and deploy using AWS Elastic Beanstalk
 
-- Create a separate GitHub repository for this application 
+## Table of contents
 
-- Download the files from this repository and upload them to your newly created repository 
+1. Create a pipeline build on Jenkins
+2. Jenkins CI/CD Pipeline
+3. Deploy application to Elastic Beanstalk
+4. System Design
 
-- Be sure to follow the deployment instructions from this Repository  
+## Create a pipeline build on Jenkins
 
-- Document your issue and what you did to fix it in a .md file in your repository.
+* Create a new item
+  * Select multibranch pipeline
+* Add source: Github
+* Create a new personal access token on github
+  * Log in to github
+  * Access the setting
+  * Select developer settings
+  * Select Token (Classic)
+  * Generate new token
+  * Check the boxes for repo, admin:org and admin:repo_hook
+* Add github credentials
+  * Add github username
+  * Add repository link
+  * Add personal access token as password
+  * Validate connection to the repository
+  * Apply and save configuration
 
-- Lastly, save your documentation and diagram into your repository. Submit your repository link to the LMS
+## Jenkins CI/CD Pipeline
 
-## Deployment instructions Link:
--  Link to instructions: https://github.com/kura-labs-org/C4_deployment-1.1/blob/main/Deployment-instructions.md
+Once the credentials are complete Jenkins will start the pipeline
+
+* Pull repository from github
+  * Clone the repository onto the EC2 instance
+  * Look for a Jenkinfile inside the repository
+  * This is the Jenkinsfile for this project
+
+    ```
+        pipeline {
+      agent any
+      stages {
+        stage ('Build') {
+          steps {
+            sh '''#!/bin/bash
+            python3 -m venv test3
+            source test3/bin/activate
+            pip install pip --upgrade
+            pip install -r requirements.txt
+            export FLASK_APP=application
+            '''
+        }
+      }
+        stage ('test') {
+          steps {
+            sh '''#!/bin/bash
+            source test3/bin/activate
+            py.test --verbose --junit-xml test-reports/results.xml
+            ''' 
+          }
+        
+          post{
+            always {
+              junit 'test-reports/results.xml'
+            }
+          
+          }
+        }
+      
+      }
+    }
+    ```
+
+  * Stages declared in the pipeline
+    * Build
+      * Install all the dependencies of the Flask application
+      * Create a virtual environment
+    * Test
+      * Run pytest to test functionality of the application
+  * Successful execution of all stages can be seen in the Jenkins GUI
+  
+![jenkins-stages](https://github.com/Antoniorios17/deployment_elastic_beanstalk/blob/main/images/Jenkins-stages.png)
+
+## Elastic Beanstalk Flask App Deployment
+
+1. Open AWS Console: [Elastic Beanstalk](us-east-1.console.aws.amazon.com/elasticbeanstalk).
+
+2. Click "Create application".
+
+3. Enter "url-shortener" as the app name.
+
+4. Choose "Python" platform.
+
+5. Select "Python 3.9 running on 64bit Amazon Linux 2023".
+
+6. Upload your zipped app code.
+
+7. Set version label to "v1".
+
+8. Select "ElasticEC2" instance profile.
+
+9. Choose your default VPC and an Availability Zone.
+
+10. Configure storage: 10 GB size, "General Purpose (SSD)".
+
+11. For instance types, select "T.2 MICRO".
+
+12. Click "Submit".
+
+13. Once environment health is "OK", note your Domain Name.
+
+![elastic-beanstalk](https://github.com/Antoniorios17/deployment_elastic_beanstalk/blob/main/images/elastic-beanstalk-ok.png)
+
+14. The Flask app is now deployed on Elastic Beanstalk. Access it using the provided Domain Name.
+
+![url-shortenet-webpage](https://github.com/Antoniorios17/deployment_elastic_beanstalk/blob/main/images/url-shortener-webpage.png)
+
+## System Design
+
+Jenkins Pipeline
+
+![system-design](https://github.com/Antoniorios17/deployment_elastic_beanstalk/blob/main/images/system-design1.png)
+
+Elastic Beanstalk Deployment
+
+![system-design](https://github.com/Antoniorios17/deployment_elastic_beanstalk/blob/main/images/system-design2.png)
