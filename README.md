@@ -117,6 +117,12 @@ Once the credentials are complete Jenkins will start the pipeline
 
 ![url-shortenet-webpage](https://github.com/Antoniorios17/deployment_elastic_beanstalk/blob/main/images/url-shortener-webpage.png)
 
+
+## Troubleshooting
+
+Initial deployment of the application on Elastic beanstalk was initially degraded.
+
+
 ## System Design
 
 Jenkins Pipeline
@@ -126,3 +132,7 @@ Jenkins Pipeline
 Elastic Beanstalk Deployment
 
 ![system-design](https://github.com/Antoniorios17/deployment_elastic_beanstalk/blob/main/images/system-design2.png)
+
+## Troubleshooting
+
+Initial deployment of the application on Elastic beanstalk.
